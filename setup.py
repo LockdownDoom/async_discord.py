@@ -38,15 +38,14 @@ extras_require = {
     ]
 }
 
-setup(name='discord.py',
-      author='Rapptz',
-      url='https://github.com/Rapptz/discord.py',
+setup(name='async_discord.py',
+      author='LockdownDoom',
+      url='https://github.com/LockdownDoom/async_discord.py',
       project_urls={
-        "Documentation": "https://discordpy.readthedocs.io/en/latest/",
-        "Issue tracker": "https://github.com/Rapptz/discord.py/issues",
+        "",
       },
       version=version,
-      packages=['discord', 'discord.ext.commands', 'discord.ext.tasks'],
+      packages=['discord'],
       license='MIT',
       description='A python wrapper for the Discord API',
       long_description="",
