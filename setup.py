@@ -41,9 +41,9 @@ extras_require = {
 setup(name='async_discord.py',
       author='LockdownDoom',
       url='https://github.com/LockdownDoom/async_discord.py',
-      project_urls={
-        "",
-      },
+      #project_urls={
+      #  "":"",
+      #},
       version=version,
       packages=['discord'],
       license='MIT',
