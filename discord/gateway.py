@@ -591,7 +591,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         return ws
     
     async def select_protocol(self, ip, port):
-        logging.log(50, "select_protocol")
+        log.debug( "select_protocol")
         payload = {
             'op': self.SELECT_PROTOCOL,
             'd': {
@@ -633,7 +633,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         log.debug('Voice websocket frame received: {}'.format(msg))
         op = msg.get('op')
         data = msg.get('d')
-        logging.log(50,op)
+        log.debug(op)
 
 ##        if op == self.READY:
 ##            interval = data['heartbeat_interval'] / 1000.0
@@ -687,7 +687,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
     async def load_secret_key(self, data):
         log.info('received secret key for voice connection')
         self._connection.secret_key = data.get('secret_key')
-        logging.log(50, self._connection.secret_key)
+        log.debug( self._connection.secret_key)
         await self.speak()
         await self.speak(False)
 
