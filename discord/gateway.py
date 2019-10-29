@@ -668,16 +668,16 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
             self._keep_alive.start()
     
     async def initial_connection(self, data):
-        logging.log(50, "INITIAL_CONNECTION")
         state = self._connection
-        state.ssrc = data.get('ssrc')
-        state.voice_port = data.get('port')
+        state.ssrc = data['ssrc']
+        state.voice_port = data['port']
+        state.endpoint_ip = data['ip']
+
         packet = bytearray(70)
         struct.pack_into('>I', packet, 0, state.ssrc)
         state.socket.sendto(packet, (state.endpoint_ip, state.voice_port))
-        logging.log(50, "waiting...")
         recv = await self.loop.sock_recv(state.socket, 70)
-        logging.log(50,'received packet in initial_connection: {}'.format(recv))
+        log.debug('received packet in initial_connection: %s', recv)
 
         # the ip is ascii starting at the 4th byte and ending at the first null
         ip_start = 4
@@ -687,11 +687,16 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         # the port is a little endian unsigned short in the last two bytes
         # yes, this is different endianness from everything else
         state.port = struct.unpack_from('<H', recv, len(recv) - 2)[0]
+        log.debug('detected ip: %s port: %s', state.ip, state.port)
 
-        log.debug('detected ip: {0.ip} port: {0.port}'.format(state))
-        logging.log(50, "selecting protocol...")
-        await self.select_protocol(state.ip, state.port)
-        log.info('selected the voice protocol for use')
+        # there *should* always be at least one supported mode (xsalsa20_poly1305)
+        modes = [mode for mode in data['modes'] if mode in self._connection.supported_modes]
+        log.debug('received supported encryption modes: %s', ", ".join(modes))
+
+        mode = modes[0]
+        await self.select_protocol(state.ip, state.port, mode)
+        log.info('selected the voice protocol for use (%s)', mode)
+
         await self.client_connect()
 
     
