@@ -567,7 +567,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
                 'token': client.token
             }
         }
-    await self.send_as_json(payload)
+        await self.send_as_json(payload)
     @classmethod
     async def from_client(cls, client):
         """Creates a voice websocket for the :class:`VoiceClient`."""
@@ -618,7 +618,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
                 'audio_ssrc': self._connection.ssrc
             }
         }
-    await self.send_as_json(payload)
+        await self.send_as_json(payload)
     
     async def speak(self, is_speaking=True):
         payload = {
