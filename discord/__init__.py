@@ -11,11 +11,11 @@ A basic wrapper for the Discord API.
 
 """
 
-__title__ = 'discord'
-__author__ = 'Rapptz'
+__title__ = 'async_discord'
+__author__ = 'LockdownDoom'
 __license__ = 'MIT'
-__copyright__ = 'Copyright 2015-2016 Rapptz'
-__version__ = '0.16.12'
+__copyright__ = ''
+__version__ = '0.16.14'
 
 from .client import Client, AppInfo, ChannelPermissions
 from .user import User

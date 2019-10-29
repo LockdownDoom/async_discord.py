@@ -557,23 +557,8 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
     async def send_as_json(self, data):
         await self.send(utils.to_json(data))
 
-    @classmethod
-    
-    async def from_client(cls, client):
-        """Creates a voice websocket for the :class:`VoiceClient`."""
-        gateway = 'wss://' + client.endpoint
-        try:
-            ws = await asyncio.wait_for(
-                    _ensure_coroutine_connect(gateway, loop=client.loop, klass=cls),
-                    timeout=60, loop=client.loop)
-        except asyncio.TimeoutError:
-            log.warn("timed out waiting for voice client connect")
-            return (await cls.from_client(client))
-
-        ws.gateway = gateway
-        ws._connection = client
-
-        identify = {
+    async def identify(self):
+        payload = {
             'op': cls.IDENTIFY,
             'd': {
                 'server_id': client.guild_id,
@@ -582,8 +567,22 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
                 'token': client.token
             }
         }
-
-        await ws.send_as_json(identify)
+    await self.send_as_json(payload)
+    @classmethod
+    async def from_client(cls, client):
+        """Creates a voice websocket for the :class:`VoiceClient`."""
+        gateway = 'wss://' + client.endpoint
+##        try:
+##            ws = await asyncio.wait_for(
+##                    _ensure_coroutine_connect(gateway, loop=client.loop, klass=cls),
+##                    timeout=60, loop=client.loop)
+##        except asyncio.TimeoutError:
+##            log.warn("timed out waiting for voice client connect")
+##            return (await cls.from_client(client))
+        ws = await websockets.connect(gateway, loop=client.loop, klass=cls,)
+        ws.gateway = gateway
+        ws._connection = client
+        ws._max_heartbeat_timeout=60.0
 
         #try:
             # Wait until we have processed READY and keep alive is running
@@ -593,9 +592,8 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         #    log.warn("timed out waiting for voice client READY")
         #    await ws.close(1001)
         #    return (await cls.from_client(client))
-
+        await ws.identify()
         return ws
-
     
     async def select_protocol(self, ip, port):
         payload = {
@@ -613,6 +611,14 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         await self.send_as_json(payload)
         log.debug('Selected protocol as {}'.format(payload))
 
+    async def client_connect(self):
+        payload={
+            'op': self.CLIENT_CONNECT,
+            'd':{
+                'audio_ssrc': self._connection.ssrc
+            }
+        }
+    await self.send_as_json(payload)
     
     async def speak(self, is_speaking=True):
         payload = {
@@ -632,14 +638,27 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         op = msg.get('op')
         data = msg.get('d')
 
+##        if op == self.READY:
+##            interval = data['heartbeat_interval'] / 1000.0
+##            self._keep_alive = VoiceKeepAliveHandler(ws=self, interval=interval)
+##            self._keep_alive.start()
+##            await self.initial_connection(data)
+##        elif op == self.SESSION_DESCRIPTION:
+##            await self.load_secret_key(data)
         if op == self.READY:
+            await self.initial_connection(data)
+        elif op == self.HEARTBEAT_ACK:
+            self._keep_alive.ack()
+        elif op == self.INVALIDATE_SESSION:
+            log.info('Voice RESUME failed.')
+            await self.identify()
+        elif op == self.SESSION_DESCRIPTION:
+            self._connection.mode = data['mode']
+            await self.load_secret_key(data)
+        elif op == self.HELLO:
             interval = data['heartbeat_interval'] / 1000.0
             self._keep_alive = VoiceKeepAliveHandler(ws=self, interval=interval)
             self._keep_alive.start()
-            await self.initial_connection(data)
-        elif op == self.SESSION_DESCRIPTION:
-            await self.load_secret_key(data)
-
     
     async def initial_connection(self, data):
         state = self._connection
@@ -663,12 +682,14 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         log.debug('detected ip: {0.ip} port: {0.port}'.format(state))
         await self.select_protocol(state.ip, state.port)
         log.info('selected the voice protocol for use')
+        await self.client_connect()
 
     
     async def load_secret_key(self, data):
         log.info('received secret key for voice connection')
         self._connection.secret_key = data.get('secret_key')
         await self.speak()
+        await self.speak(False)
 
     
     async def poll_event(self):
