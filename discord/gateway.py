@@ -643,6 +643,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         log.debug('Voice websocket frame received: {}'.format(msg))
         op = msg.get('op')
         data = msg.get('d')
+        logging.log(50,op)
 
 ##        if op == self.READY:
 ##            interval = data['heartbeat_interval'] / 1000.0
