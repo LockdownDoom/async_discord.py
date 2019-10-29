@@ -559,7 +559,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
 
     async def identify(self):
         payload = {
-            'op': cls.IDENTIFY,
+            'op': self.IDENTIFY,
             'd': {
                 'server_id': client.guild_id,
                 'user_id': client.user.id,
