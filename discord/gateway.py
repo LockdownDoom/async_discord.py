@@ -702,7 +702,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
             raise ConnectionClosed(e) from e
 
     
-    async def close_connection(self, force=False):
+    async def close_connection(self):
         if self._keep_alive:
             self._keep_alive.stop()
 
