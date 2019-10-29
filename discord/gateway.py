@@ -590,7 +590,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         await ws.identify()
         return ws
     
-    async def select_protocol(self, ip, port):
+    async def select_protocol(self, ip, port, mode):
         log.debug( "select_protocol")
         payload = {
             'op': self.SELECT_PROTOCOL,
@@ -599,7 +599,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
                 'data': {
                     'address': ip,
                     'port': port,
-                    'mode': 'xsalsa20_poly1305'
+                    'mode': mode
                 }
             }
         }
@@ -678,6 +678,12 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         # yes, this is different endianness from everything else
         state.port = struct.unpack_from('<H', recv, len(recv) - 2)[0]
         log.debug('detected ip: %s port: %s', state.ip, state.port)
+
+        modes = [mode for mode in data['modes'] if mode in self._connection.supported_modes]
+
+        mode = modes[0]
+        await self.select_protocol(state.ip, state.port, mode)
+        log.info('selected the voice protocol for use (%s)', mode)
         
         await self.select_protocol(state.ip, state.port)
 
