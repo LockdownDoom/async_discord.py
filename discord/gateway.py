@@ -693,6 +693,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
     async def load_secret_key(self, data):
         log.info('received secret key for voice connection')
         self._connection.secret_key = data.get('secret_key')
+        logging.log(50, self._connection.secret_key)
         await self.speak()
         await self.speak(False)
 
