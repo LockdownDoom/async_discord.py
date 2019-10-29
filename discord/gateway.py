@@ -674,8 +674,8 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         packet = bytearray(70)
         struct.pack_into('>I', packet, 0, state.ssrc)
         state.socket.sendto(packet, (state.endpoint_ip, state.voice_port))
-        #recv = await self.loop.sock_recv(state.socket, 70)
-        #log.debug('received packet in initial_connection: {}'.format(recv))
+        recv = await self.loop.sock_recv(state.socket, 70)
+        log.debug('received packet in initial_connection: {}'.format(recv))
 
         # the ip is ascii starting at the 4th byte and ending at the first null
         ip_start = 4
@@ -687,6 +687,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         state.port = struct.unpack_from('<H', recv, len(recv) - 2)[0]
 
         log.debug('detected ip: {0.ip} port: {0.port}'.format(state))
+        logging.log(50, "selecting protocol...")
         await self.select_protocol(state.ip, state.port)
         log.info('selected the voice protocol for use')
         await self.client_connect()
