@@ -693,9 +693,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         modes = [mode for mode in data['modes'] if mode in self._connection.supported_modes]
         log.debug('received supported encryption modes: %s', ", ".join(modes))
 
-        mode = modes[0]
-        await self.select_protocol(state.ip, state.port, mode)
-        log.info('selected the voice protocol for use (%s)', mode)
+        await self.select_protocol(state.ip, state.port)
 
         await self.client_connect()
 
