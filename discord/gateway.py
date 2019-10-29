@@ -675,6 +675,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         packet = bytearray(70)
         struct.pack_into('>I', packet, 0, state.ssrc)
         state.socket.sendto(packet, (state.endpoint_ip, state.voice_port))
+        logging.log(50, "waiting...")
         recv = await self.loop.sock_recv(state.socket, 70)
         logging.log(50,'received packet in initial_connection: {}'.format(recv))
 
