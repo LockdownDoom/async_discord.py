@@ -28,12 +28,13 @@ import aiohttp
 from . import utils, compat
 from .enums import Status, try_enum
 from .game import Game
-from .errors import GatewayNotFound, ConnectionClosed, InvalidArgument, TimeoutError
+from .errors import GatewayNotFound, ConnectionClosed, InvalidArgument
 import logging
 import zlib, time, json
 from collections import namedtuple
 import threading
 import struct
+import concurrent
 
 log = logging.getLogger(__name__)
 
@@ -695,7 +696,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         try:
             msg = await asyncio.wait_for(self.recv(), timeout=30.0, loop=self.loop)
             await self.received_message(json.loads(msg))
-        except TimeoutError:
+        except concurrent.futures._base.TimeoutError:
             pass
         except websockets.exceptions.ConnectionClosed as e:
             raise ConnectionClosed(e) from e
