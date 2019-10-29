@@ -601,6 +601,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         return ws
     
     async def select_protocol(self, ip, port):
+        logging.log(50, "select_protocol")
         payload = {
             'op': self.SELECT_PROTOCOL,
             'd': {
@@ -658,10 +659,10 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
             log.info('Voice RESUME failed.')
             await self.identify()
         elif op == self.SESSION_DESCRIPTION:
-            #self._connection.mode = data['mode']
+            self._connection.mode = data['mode']
             await self.load_secret_key(data)
         elif op == self.HELLO:
-            interval = data['heartbeat_interval'] / 1000.0
+            interval = (data['heartbeat_interval'] * .75) / 1000.0
             self._keep_alive = VoiceKeepAliveHandler(ws=self, interval=interval)
             self._keep_alive.start()
     
