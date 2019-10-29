@@ -28,7 +28,7 @@ import aiohttp
 from . import utils, compat
 from .enums import Status, try_enum
 from .game import Game
-from .errors import GatewayNotFound, ConnectionClosed, InvalidArgument
+from .errors import GatewayNotFound, ConnectionClosed, InvalidArgument, TimeoutError
 import logging
 import zlib, time, json
 from collections import namedtuple
@@ -652,7 +652,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
             self._connection.mode = data['mode']
             await self.load_secret_key(data)
         elif op == self.HELLO:
-            interval = (data['heartbeat_interval'] * .75) / 1000.0
+            interval = data['heartbeat_interval'] / 1000.0
             self._keep_alive = VoiceKeepAliveHandler(ws=self, interval=interval)
             self._keep_alive.start()
     
@@ -695,6 +695,8 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         try:
             msg = await asyncio.wait_for(self.recv(), timeout=30.0, loop=self.loop)
             await self.received_message(json.loads(msg))
+        except TimeoutError:
+            pass
         except websockets.exceptions.ConnectionClosed as e:
             raise ConnectionClosed(e) from e
 
