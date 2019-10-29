@@ -668,6 +668,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
             self._keep_alive.start()
     
     async def initial_connection(self, data):
+        logging.log(50, "INITIAL_CONNECTION")
         state = self._connection
         state.ssrc = data.get('ssrc')
         state.voice_port = data.get('port')
