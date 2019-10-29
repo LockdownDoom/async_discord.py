@@ -557,14 +557,14 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
     async def send_as_json(self, data):
         await self.send(utils.to_json(data))
 
-    async def identify(self):
+    async def identify(self,client):
         payload = {
             'op': self.IDENTIFY,
             'd': {
-                'server_id': client.guild_id,
-                'user_id': client.user.id,
-                'session_id': client.session_id,
-                'token': client.token
+                'server_id': self._connection.guild_id,
+                'user_id': self._connection.user.id,
+                'session_id': self._connection.session_id,
+                'token': self._connection.token
             }
         }
         await self.send_as_json(payload)
