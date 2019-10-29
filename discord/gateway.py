@@ -2,19 +2,15 @@
 
 """
 The MIT License (MIT)
-
 Copyright (c) 2015-2016 Rapptz
-
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
 to deal in the Software without restriction, including without limitation
 the rights to use, copy, modify, merge, publish, distribute, sublicense,
 and/or sell copies of the Software, and to permit persons to whom the
 Software is furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -128,10 +124,8 @@ class VoiceKeepAliveHandler(KeepAliveHandler):
 
 class DiscordWebSocket(websockets.client.WebSocketClientProtocol):
     """Implements a WebSocket for Discord's gateway v6.
-
     This is created through :func:`create_main_websocket`. Library
     users should never create this manually.
-
     Attributes
     -----------
     DISPATCH
@@ -197,7 +191,6 @@ class DiscordWebSocket(websockets.client.WebSocketClientProtocol):
     
     async def from_client(cls, client, *, resume=False):
         """Creates a main websocket for Discord from a :class:`Client`.
-
         This is for internal use only.
         """
         gateway = await client.http.get_gateway()
@@ -247,7 +240,6 @@ class DiscordWebSocket(websockets.client.WebSocketClientProtocol):
 
     def wait_for(self, event, predicate, result=None):
         """Waits for a DISPATCH'd event that meets the predicate.
-
         Parameters
         -----------
         event : str
@@ -258,7 +250,6 @@ class DiscordWebSocket(websockets.client.WebSocketClientProtocol):
         result
             A function that takes the same data parameter and executes to send
             the result to the future. If None, returns the data.
-
         Returns
         --------
         asyncio.Future
@@ -420,7 +411,6 @@ class DiscordWebSocket(websockets.client.WebSocketClientProtocol):
     
     async def poll_event(self):
         """Polls for a DISPATCH event and handles the general gateway loop.
-
         Raises
         ------
         ConnectionClosed
@@ -523,7 +513,6 @@ class DiscordWebSocket(websockets.client.WebSocketClientProtocol):
 
 class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
     """Implements the websocket protocol for handling voice connections.
-
     Attributes
     -----------
     IDENTIFY
@@ -688,7 +677,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
         # yes, this is different endianness from everything else
         state.port = struct.unpack_from('<H', recv, len(recv) - 2)[0]
         log.debug('detected ip: %s port: %s', state.ip, state.port)
-
+        
         await self.select_protocol(state.ip, state.port)
 
         await self.client_connect()
@@ -715,5 +704,3 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
             self._keep_alive.stop()
 
         await super().close_connection(force=force)
-
-
