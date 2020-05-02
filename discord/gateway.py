@@ -653,8 +653,7 @@ class DiscordVoiceWebSocket(websockets.client.WebSocketClientProtocol):
             self._connection.mode = data['mode']
             await self.load_secret_key(data)
         elif op == self.HELLO:
-            #The heartbeat interval is set to 0.75 because of a bug with discord. When this bug is fixed, remove the 0.75x multiplier
-            interval = (data['heartbeat_interval'] * 0.75)/ 1000.0
+            interval = data['heartbeat_interval'] / 1000.0
             self._keep_alive = VoiceKeepAliveHandler(ws=self, interval=interval)
             self._keep_alive.start()
     
