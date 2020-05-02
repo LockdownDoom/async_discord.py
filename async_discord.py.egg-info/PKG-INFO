@@ -1,0 +1,24 @@
+Metadata-Version: 2.1
+Name: async-discord.py
+Version: 0.16.14
+Summary: A python wrapper for the Discord API
+Home-page: https://github.com/LockdownDoom/async_discord.py
+Author: LockdownDoom
+License: MIT
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Intended Audience :: Developers
+Classifier: Natural Language :: English
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Topic :: Internet
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Utilities
+Requires-Python: >=3.5.3
+Provides-Extra: docs
+Provides-Extra: voice
